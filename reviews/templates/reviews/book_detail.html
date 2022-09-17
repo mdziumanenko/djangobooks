@@ -1,0 +1,56 @@
+{% extends 'reviews/base.html' %}
+
+{% block content %}
+      <br>
+      <h3>Book Details</h3>
+      <hr>
+      {% if book.cover %}
+            <img src="{{book.cover.url}}">
+            <br>
+      {% endif %}
+      <span class="text-info">Title: </span> <span>{{ book.title }}</span>
+      <br>
+      <span class="text-info">Publisher: </span><span>{{ book.publisher }}</span>
+      <br>
+      <span class="text-info">Publication Date: </span><span>{{ book.publication_date }}</span>
+      <br>
+      {% if book.sample %}
+            <span class="text-info">Sample: </span>
+            <span><a href="{{ book.sample.url }}">Downloads</a></span>
+      {% endif %}
+
+      {% if not reviews %}
+        {% if user.is_authenticated %}
+            <hr>
+            <h3>Be the first one to write a review.</h3>
+        {% endif %}
+      {% else %}
+            <span class="text-info">Overall Rating: </span><span class="badge badge-primary badge-pill">{{ book_rating }}</span>
+            <br>
+            <hr>
+            <h3>Review Comments</h3>
+            <ul>			<!-- w/o class="list-group-item" -->
+            {% for review in reviews %}
+                  <li class="list-group-item">
+                        <span class="text-info">Review comment: </span> <span>{{ review.content }}</span>
+                        <br>
+                        <span class="text-info">Created on: </span><span>{{ review.date_created }}</span>
+                        <br>
+                        <span class="text-info">Modified on: </span><span>{{ review.date_edited }}</span>
+                        <br>
+                        <span class="text-info">Rating: </span><span class="badge badge-secondary badge-pill">{{ review.rating }}</span>
+                        <br>
+                        <span class="text-info">Creator: </span><span>{{ review.creator.username }}</span>
+                  {% if user.is_staff or review.creator.id == user.id %}
+                        <br>
+                        <a href="{% url 'review_edit' book.pk review.pk %}" class="btn btn-primary">Edit Review</a>
+                  {% endif %}
+                  </li>
+            {% endfor %}
+            </ul>
+      {% endif %}
+  {% if user.is_authenticated %}
+      <a href="{% url 'review_create' book.pk %}" class="btn btn-primary">Add Review</a>
+      <a href="{% url 'book_media' book.pk %}" class="btn btn-primary">Media</a>
+  {% endif %}
+{% endblock %}
